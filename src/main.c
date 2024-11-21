@@ -88,7 +88,7 @@ void app_main(void)
             ESP_LOGI(TAG, "starting sensor task...");
             task_sensor_args_t task_sensor_args = {&rbuf, 1};
 			system_task_start_in_core(&sys_stf_p1, &task_sensor, TASK_SENSOR, "TASK_SENSOR", TASK_SENSOR_STACK_SIZE, &task_sensor_args, 0, CORE0);
-			ESP_LOGI(TAG, "DoneT");
+			ESP_LOGI(TAG, "Done");
 
 			// Delay
 			vTaskDelay(pdMS_TO_TICKS(1000));
