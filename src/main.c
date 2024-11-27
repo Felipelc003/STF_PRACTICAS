@@ -48,6 +48,8 @@ void app_main(void)
 	system_set_default_state(&sys_stf_p1, INIT);
 
 
+
+
 	// Define manejadores de tareas (de momento sin asignar)
 	system_task_t task_sensor;
 	system_task_t task_monitor;
