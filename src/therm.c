@@ -22,27 +22,20 @@ esp_err_t therm_init(therm_t *thermistor, adc_channel_t channel) {
     return ESP_OK;
 }
 
-// Lee la temperatura del termistor (en grados Celsius)
-float therm_read_t(therm_t thermistor) {
-    uint16_t lsb = therm_read_lsb(thermistor);
-    float voltage = _therm_lsb2v(lsb);
-    return _therm_v2t(voltage);
-}
-
-// Lee el voltaje del termistor
-float therm_read_v(therm_t thermistor) {
-    uint16_t lsb = therm_read_lsb(thermistor);
-    return _therm_lsb2v(lsb);
-}
-
-// Lee el valor crudo (LSB) del ADC
+// Lee el valor en BINARIO del ADC
 uint16_t therm_read_lsb(therm_t thermistor) {
     int raw_value = 0;
     adc_oneshot_read(thermistor.adc_hdlr, thermistor.adc_channel, &raw_value);
     return (uint16_t)raw_value;
 }
 
-// Convierte el voltaje a temperatura (en grados Celsius)
+// Convierte el valor en BINARIO a VOLTAJE
+float _therm_lsb2v(uint16_t lsb) {
+    float voltage = (lsb / 4095.0) * 3.3;  // Resolución de 12 bits y rango de 3.3V
+    return voltage;
+}
+
+// Convierte el VOLTAJE a TEMPERATURA (en grados Celsius)
 float _therm_v2t(float v) {
     float resistance = (SERIES_RESISTANCE * v) / (3.3 - v);  // Resistencia calculada
     float temperature = 1.0 / (log(resistance / NOMINAL_RESISTANCE) / BETA_COEFFICIENT + 1.0 / NOMINAL_TEMPERATURE);
@@ -50,8 +43,22 @@ float _therm_v2t(float v) {
     return temperature;
 }
 
-// Convierte un valor LSB a voltaje
-float _therm_lsb2v(uint16_t lsb) {
-    float voltage = (lsb / 4095.0) * 3.3;  // Resolución de 12 bits y rango de 3.3V
-    return voltage;
+// Convierte el valor BINARIO del ACD a TEMPERATURA
+float therm_read_t(therm_t thermistor) {
+    uint16_t lsb = therm_read_lsb(thermistor);//Lee el BINARIO del ADC
+    float voltage = _therm_lsb2v(lsb);//Convierte el Bianrio a Voltaje
+    return _therm_v2t(voltage);//Convierte el Voltje a Temperatura
 }
+
+// OBTIENE el voltaje del termistor
+float therm_read_v(therm_t thermistor) {
+    uint16_t lsb = therm_read_lsb(thermistor);
+    return _therm_lsb2v(lsb);
+}
+
+
+
+
+
+
+
