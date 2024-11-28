@@ -76,3 +76,28 @@ float _therm_lsb2v(uint16_t lsb) {
     ESP_LOGD(TAG, "Voltaje calculado a partir de LSB: %f V", voltage);
     return voltage;
 }
+
+// Ejemplo de uso del módulo en el código principal
+void therm_example_usage(void) {
+    // Configuración del ADC
+    adc_oneshot_unit_handle_t adc_hdlr;
+    adc_oneshot_unit_init_cfg_t unit_cfg = {
+        .unit_id = ADC_UNIT_1,
+        .clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+    };
+    ESP_ERROR_CHECK(adc_oneshot_new_unit(&unit_cfg, &adc_hdlr));
+
+    // Configuración del termistor
+    therm_t t1;
+    ESP_ERROR_CHECK(therm_init(&t1, ADC_CHANNEL_6));
+
+    // Lecturas
+    float temperature = therm_read_t(t1);
+    float voltage = therm_read_v(t1);
+    uint16_t lsb = therm_read_lsb(t1);
+
+    // Salida de resultados
+    ESP_LOGI(TAG, "Temperatura: %.2f °C", temperature);
+    ESP_LOGI(TAG, "Voltaje: %.2f V", voltage);
+    ESP_LOGI(TAG, "Valor crudo LSB: %d", lsb);
+}
