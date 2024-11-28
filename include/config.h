@@ -33,18 +33,18 @@
 // Nombre y estados de la máquina
 #define SYS_NAME "STF P1 System"
 enum{
-	INIT,
+    INIT,
     SENSOR_LOOP
 };
 
 // Configuración del termistor
-
-#define THERMISTOR_ADC_UNIT ADC_UNIT_1
-#define THERMISTOR_ADC_CHANNEL ADC_CHANNEL_6 // GPIO34
+// Ahora la configuración del ADC se maneja automáticamente en el módulo term.c, 
+// por lo que no es necesario definirla aquí.
 #define SERIES_RESISTANCE 10000       // 10K ohms
 #define NOMINAL_RESISTANCE 10000      // 10K ohms
 #define NOMINAL_TEMPERATURE 298.15    // 25°C en Kelvin
 #define BETA_COEFFICIENT 3950         // Constante B (ajustar según el termistor)
+
 
 // Configuración del buffer cíclico
 #define BUFFER_SIZE  2048
@@ -58,8 +58,8 @@ SYSTEM_TASK(TASK_SENSOR);
 // definición de los argumentos que requiere la tarea
 typedef struct 
 {
-	RingbufHandle_t* rbuf; // puntero al buffer 
-	uint8_t freq;          // frecuencia de muestreo
+    RingbufHandle_t* rbuf; // puntero al buffer 
+    uint8_t freq;          // frecuencia de muestreo
     // ...
 }task_sensor_args_t;
 // Timeout de la tarea (ver system_task_stop)
@@ -73,7 +73,7 @@ SYSTEM_TASK(TASK_MONITOR);
 // definición de los argumentos que requiere la tarea
 typedef struct 
 {
-	RingbufHandle_t* rbuf; // puntero al buffer 
+    RingbufHandle_t* rbuf; // puntero al buffer 
     // ...
 }task_monitor_args_t;
 // Timeout de la tarea (ver system_task_stop)

@@ -9,6 +9,7 @@
 #define NOMINAL_RESISTANCE 10000   // 10K ohms
 #define NOMINAL_TEMPERATURE 298.15 // 25°C en Kelvin
 #define BETA_COEFFICIENT 3950      // Constante B
+#define VOLTAJE_REFERENCIA 3.3        // Voltaje de referencia del ADC
 
 // Definición de la estructura para el termistor
 typedef struct therm_conf_t
@@ -18,7 +19,7 @@ typedef struct therm_conf_t
 } therm_t;
 
 // Funciones para configurar y leer del termistor
-esp_err_t therm_init(therm_t *thermistor, adc_channel_t channel);
+esp_err_t therm_config(therm_t* thermistor , adc_oneshot_unit_handle_t adc, adc_channel_t channel);
 float therm_read_t(therm_t thermistor);
 float therm_read_v(therm_t thermistor);
 uint16_t therm_read_lsb(therm_t thermistor);

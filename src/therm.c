@@ -1,31 +1,34 @@
-#include "therm.h"
 #include <math.h>
 #include <esp_log.h>
+#include "therm.h"
+
+
 
 // Definir una etiqueta para los logs
 static const char *TAG = "THERM";
 
-// Función para inicializar el termistor y configurar el ADC
-esp_err_t therm_init(therm_t *thermistor, adc_channel_t channel) {
+// Configura el termistor con un manejador ADC y un canal específico
+esp_err_t therm_config(therm_t* thermistor, adc_oneshot_unit_handle_t adc, adc_channel_t channel) {
+    if (!thermistor) return ESP_ERR_INVALID_ARG;
 
-    // Configuración del ADC
-    adc_oneshot_unit_init_cfg_t unit_cfg = {
-        .unit_id = ADC_UNIT_1,                // Usar ADC1
-        .clk_src = ADC_RTC_CLK_SRC_DEFAULT,   // Fuente de reloj por defecto
-    };
-
-    adc_oneshot_new_unit(&unit_cfg, &thermistor->adc_hdlr);
-
-    // Configurar el canal del ADC
+    thermistor->adc_hdlr = adc;
     thermistor->adc_channel = channel;
 
-    return ESP_OK;
+    adc_oneshot_chan_cfg_t channel_cfg = {
+        .atten = ADC_ATTEN_DB_11,  // Rango de 0 a 3.3V
+        .bitwidth = ADC_BITWIDTH_12  // Resolución de 12 bits
+    };
+    return adc_oneshot_config_channel(adc, channel, &channel_cfg);
 }
 
 // Lee el valor en BINARIO del ADC
 uint16_t therm_read_lsb(therm_t thermistor) {
     int raw_value = 0;
-    adc_oneshot_read(thermistor.adc_hdlr, thermistor.adc_channel, &raw_value);
+    esp_err_t ret = adc_oneshot_read(thermistor.adc_hdlr, thermistor.adc_channel, &raw_value);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Error al leer el ADC: %s", esp_err_to_name(ret));
+        return 0;
+    }
     return (uint16_t)raw_value;
 }
 
@@ -37,7 +40,7 @@ float _therm_lsb2v(uint16_t lsb) {
 
 // Convierte el VOLTAJE a TEMPERATURA (en grados Celsius)
 float _therm_v2t(float v) {
-    float resistance = (SERIES_RESISTANCE * v) / (3.3 - v);  // Resistencia calculada
+    float resistance = (SERIES_RESISTANCE * v) / (VOLTAJE_REFERENCIA - v);  // Resistencia calculada
     float temperature = 1.0 / (log(resistance / NOMINAL_RESISTANCE) / BETA_COEFFICIENT + 1.0 / NOMINAL_TEMPERATURE);
     temperature -= 273.15;  // Convertir de Kelvin a Celsius
     return temperature;
@@ -45,9 +48,9 @@ float _therm_v2t(float v) {
 
 // Convierte el valor BINARIO del ACD a TEMPERATURA
 float therm_read_t(therm_t thermistor) {
-    uint16_t lsb = therm_read_lsb(thermistor);//Lee el BINARIO del ADC
-    float voltage = _therm_lsb2v(lsb);//Convierte el Bianrio a Voltaje
-    return _therm_v2t(voltage);//Convierte el Voltje a Temperatura
+    uint16_t lsb = therm_read_lsb(thermistor); // Lee el BINARIO del ADC
+    float voltage = _therm_lsb2v(lsb);         // Convierte el BINARIO a Voltaje
+    return _therm_v2t(voltage);                // Convierte el Voltaje a Temperatura
 }
 
 // OBTIENE el voltaje del termistor
@@ -55,10 +58,3 @@ float therm_read_v(therm_t thermistor) {
     uint16_t lsb = therm_read_lsb(thermistor);
     return _therm_lsb2v(lsb);
 }
-
-
-
-
-
-
-
