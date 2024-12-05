@@ -1,31 +1,34 @@
-#ifndef __THERM_H__
-#define __THERM_H__
+#ifndef _THERM_H_
+#define _THERM_H_
 
 #include <esp_adc/adc_oneshot.h>
 #include <hal/adc_types.h>
 
-// Definición de las constantes del termistor
-#define SERIES_RESISTANCE 10000    // 10K ohms
-#define NOMINAL_RESISTANCE 10000   // 10K ohms
-#define NOMINAL_TEMPERATURE 298.15 // 25°C en Kelvin
-#define BETA_COEFFICIENT 3950      // Constante B
-#define VOLTAJE_REFERENCIA 3.3        // Voltaje de referencia del ADC
+// Parámetros de configuración del termistor
+#define SERIES_RESISTANCE      10000       // Resistencia en serie (10kΩ)
+#define NOMINAL_RESISTANCE     10000       // Resistencia nominal a 25°C (10kΩ)
+#define NOMINAL_TEMPERATURE    298.15      // 25°C en Kelvin
+#define BETA_COEFFICIENT       3950        // Coeficiente B del termistor
 
-// Definición de la estructura para el termistor
-typedef struct therm_conf_t
-{
+// Parámetros de configuración del ADC
+#define REFERENCE_VOLTAGE      3.3         // Voltaje de referencia del ADC
+#define ADC_MAX_VALUE          4095.0      // Valor máximo del ADC (12 bits)
+#define THERMISTOR_ADC_UNIT    ADC_UNIT_1  // Unidad del ADC
+
+// Estructura para representar un termistor
+typedef struct therm_conf_t {
     adc_oneshot_unit_handle_t adc_hdlr;  // Manejador del ADC
     adc_channel_t adc_channel;           // Canal del ADC
 } therm_t;
 
-// Funciones para configurar y leer del termistor
-esp_err_t therm_config(therm_t* thermistor , adc_oneshot_unit_handle_t adc, adc_channel_t channel);
-float therm_read_t(therm_t thermistor);
-float therm_read_v(therm_t thermistor);
+// Funciones para configurar y leer el termistor
+esp_err_t therm_config(therm_t* thermistor, adc_oneshot_unit_handle_t adc, adc_channel_t channel);
 uint16_t therm_read_lsb(therm_t thermistor);
+float therm_read_v(therm_t thermistor);
+float therm_read_t(therm_t thermistor);
 
 // Funciones privadas de conversión
-float _therm_v2t(float v);
 float _therm_lsb2v(uint16_t lsb);
+float _therm_v2t(float v);
 
 #endif
