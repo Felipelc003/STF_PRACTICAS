@@ -44,7 +44,9 @@ enum{
 #define NOMINAL_RESISTANCE 10000      // 10K ohms
 #define NOMINAL_TEMPERATURE 298.15    // 25°C en Kelvin
 #define BETA_COEFFICIENT 3950         // Constante B (ajustar según el termistor)
-#define THERMISTOR_ADC_CHANNEL ADC_CHANNEL_6
+#define THERMISTOR_ADC_CHANNEL ADC_CHANNEL_6        // Canal del ADC 1
+#define SECOND_THERMISTOR_ADC_CHANNEL ADC_CHANNEL_7 // Canal del ADC 2
+
 
 // Configuración del buffer cíclico
 #define BUFFER_SIZE  2048
