@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-static const char* TAG = "STF_P1:task_comprobador";
+static const char* TAG = "STF_P1:task_checker";
 
 SYSTEM_TASK(TASK_CHECKER) {
     TASK_BEGIN();
