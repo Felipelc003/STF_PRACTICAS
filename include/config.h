@@ -44,9 +44,7 @@ enum{
 #define NOMINAL_RESISTANCE 10000      // 10K ohms
 #define NOMINAL_TEMPERATURE 298.15    // 25°C en Kelvin
 #define BETA_COEFFICIENT 3950         // Constante B (ajustar según el termistor)
-#define THERMISTOR_ADC_CHANNEL ADC_CHANNEL_6        // Canal del ADC 1
-#define SECOND_THERMISTOR_ADC_CHANNEL ADC_CHANNEL_7 // Canal del ADC 2
-
+#define THERMISTOR_ADC_CHANNEL ADC_CHANNEL_6
 
 // Configuración del buffer cíclico
 #define BUFFER_SIZE  2048
@@ -60,10 +58,13 @@ SYSTEM_TASK(TASK_SENSOR);
 // definición de los argumentos que requiere la tarea
 typedef struct 
 {
-    RingbufHandle_t* rbuf; // puntero al buffer 
+    RingbufHandle_t* rbuf; // puntero al buffer
+    RingbufHandle_t* checker_rbuf; // Buffer hacia Comprobador (NUEVO)
     uint8_t freq;          // frecuencia de muestreo
+    uint8_t N;
     // ...
 }task_sensor_args_t;
+
 // Timeout de la tarea (ver system_task_stop)
 #define TASK_SENSOR_TIMEOUT_MS 2000 
 // Tamaño de la pila de la tarea
@@ -78,9 +79,29 @@ typedef struct
     RingbufHandle_t* rbuf; // puntero al buffer 
     // ...
 }task_monitor_args_t;
+
+
+typedef struct {
+    uint8_t id_source;      // Origen del mensaje
+    float data;             // Dato adicional (desviación)
+} message_monitor_t;
+
+
 // Timeout de la tarea (ver system_task_stop)
 #define TASK_MONITOR_TIMEOUT_MS 2000 
 // Tamaño de la pila de la tarea
 #define TASK_MONITOR_STACK_SIZE 4096
+
+#define SECOND_THERMISTOR_ADC_CHANNEL ADC_CHANNEL_7 // Canal ADC del segundo termistor
+
+// Configuración del número de periodos para activar el comprobador
+//#define SENSOR_CHECK_PERIOD 5 // Número de periodos (N)
+
+// Configuración del buffer entre Sensor y Comprobador
+#define BUFFER_CHECKER_SIZE  1024
+#define BUFFER_CHECKER_TYPE  RINGBUF_TYPE_NOSPLIT
+
+
+
 
 #endif

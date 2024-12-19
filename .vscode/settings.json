@@ -2,6 +2,10 @@
     "files.associations": {
         "config.h": "c",
         "system.h": "c",
-        "esp_log.h": "c"
+        "esp_log.h": "c",
+        "therm.h": "c",
+        "esp_system.h": "c",
+        "esp_event.h": "c",
+        "freertos.h": "c"
     }
 }
