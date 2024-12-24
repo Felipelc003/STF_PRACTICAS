@@ -1,1 +1,0 @@
-# STF_PRACTICA1
