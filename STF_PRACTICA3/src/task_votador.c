@@ -40,7 +40,7 @@ SYSTEM_TASK(TASK_VOTADOR) {
                 ESP_LOGE(TAG, "Datos inesperados recibidos: %d bytes", length);
             }
 
-            // // Devuelve el elemento al RingBuffer
+            // Devuelve el elemento al RingBuffer
             vRingbufferReturnItem(*rbuf_sensor, ptr);
         } else {
             ESP_LOGW(TAG, "Esperando datos ...");
