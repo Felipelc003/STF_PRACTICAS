@@ -91,6 +91,7 @@ typedef struct
 {
     RingbufHandle_t* rbuf_sensor; // puntero al buffer del sensor
     RingbufHandle_t* rbuf_monitor; // puntero al buffer del monitor
+    uint32_t mask; // máscara de votación
 } task_votador_args_t;
 // Timeout de la tarea (ver system_task_stop)
 #define TASK_VOTADOR_TIMEOUT_MS 2000 

@@ -102,7 +102,7 @@ void app_main(void)
 
              // Configuración y arranque de la tarea VOTADOR
             ESP_LOGI(TAG, "Starting votador task...");
-            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor};
+            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor, 0xFFFF}; // Máscara de votación, cuantos más bits menos significativos se quiten, más precisión pierde
             system_task_start_in_core(&sys_stf_p1, &task_votador, TASK_VOTADOR, "TASK_VOTADOR", TASK_VOTADOR_STACK_SIZE, &task_votador_args, 0, CORE0);
             ESP_LOGI(TAG, "Votador task started");
 

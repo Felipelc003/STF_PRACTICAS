@@ -13,6 +13,7 @@ SYSTEM_TASK(TASK_VOTADOR) {
     task_votador_args_t* ptr_args = (task_votador_args_t*)TASK_ARGS;
     RingbufHandle_t* rbuf_sensor = ptr_args->rbuf_sensor;
     RingbufHandle_t* rbuf_monitor = ptr_args->rbuf_monitor;
+    uint32_t mask = ptr_args->mask; // Declara y asigna la máscara
 
     size_t length;
     void *ptr;
@@ -27,6 +28,17 @@ SYSTEM_TASK(TASK_VOTADOR) {
             if (length == sizeof(raw_values)) {
                 // Copia los datos en el arreglo de valores crudos
                 memcpy(raw_values, ptr, sizeof(raw_values));
+
+            // // Imprime los valores crudos antes de aplicar la máscara (solo para probar que está funcoinado la máscara)
+            // ESP_LOGI(TAG, "Valores crudos antes de la máscara: %04X, %04X, %04X", raw_values[0], raw_values[1], raw_values[2]);
+
+                // Aplica la máscara a los valores crudos
+                raw_values[0] &= mask;
+                raw_values[1] &= mask;
+                raw_values[2] &= mask;
+
+            // // Imprime los valores crudos después de aplicar la máscara (solo para probar que está funcoinado la máscara)
+            // ESP_LOGI(TAG, "Valores crudos después de la máscara: %04X, %04X, %04X", raw_values[0], raw_values[1], raw_values[2]);
 
                 // Implementa la lógica de votación
                 result = (raw_values[0] & raw_values[1]) | (raw_values[0] & raw_values[2]) | (raw_values[1] & raw_values[2]);
