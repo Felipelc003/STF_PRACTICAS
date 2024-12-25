@@ -40,7 +40,10 @@ void app_main(void)
     ESP_LOGI(TAG, "Starting STF_P1 system");
     system_create(&sys_stf_p1, SYS_NAME);
     system_register_state(&sys_stf_p1, INIT);
-    system_register_state(&sys_stf_p1, SENSOR_LOOP);
+    //system_register_state(&sys_stf_p1, SENSOR_LOOP);
+    system_register_state(&sys_stf_p1, ALL_SENSORS_OK);
+    system_register_state(&sys_stf_p1, ONE_SENSOR_FAIL);
+    system_register_state(&sys_stf_p1, CRITICAL_ERROR);
     system_set_default_state(&sys_stf_p1, INIT);
 
     // Define manejadores de tareas
@@ -102,7 +105,7 @@ void app_main(void)
 
              // Configuración y arranque de la tarea VOTADOR
             ESP_LOGI(TAG, "Starting votador task...");
-            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor, 0xFF00}; // Máscara de votación, cuantos más bits menos significativos se quiten, más precisión pierde
+            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor, 0xFF80}; // Máscara de votación, cuantos más bits menos significativos se quiten, más precisión pierde
             system_task_start_in_core(&sys_stf_p1, &task_votador, TASK_VOTADOR, "TASK_VOTADOR", TASK_VOTADOR_STACK_SIZE, &task_votador_args, 0, CORE0);
             ESP_LOGI(TAG, "Votador task started");
 
@@ -116,15 +119,15 @@ void app_main(void)
             ESP_LOGI(TAG, "Monitor task started");
 
             // Cambia al estado SENSOR_LOOP
-            SWITCH_ST(&sys_stf_p1, SENSOR_LOOP);
+            SWITCH_ST(&sys_stf_p1, ALL_SENSORS_OK);
             STATE_END();
         }
-        STATE(SENSOR_LOOP)
-        {
-            STATE_BEGIN();
-            ESP_LOGI(TAG, "State: SENSOR_LOOP");
-            STATE_END();
-        }
+        // STATE(SENSOR_LOOP)
+        // {
+        //     STATE_BEGIN();
+        //     ESP_LOGI(TAG, "State: SENSOR_LOOP");
+        //     STATE_END();
+        // }
         STATE(ALL_SENSORS_OK)
         {
             STATE_BEGIN();

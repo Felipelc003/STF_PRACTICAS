@@ -34,7 +34,7 @@
 #define SYS_NAME "STF P1 System"
 enum{
     INIT,
-    SENSOR_LOOP,
+    //SENSOR_LOOP,
     ALL_SENSORS_OK,
     ONE_SENSOR_FAIL,
     CRITICAL_ERROR

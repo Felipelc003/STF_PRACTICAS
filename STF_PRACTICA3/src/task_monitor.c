@@ -39,19 +39,16 @@ SYSTEM_TASK(TASK_MONITOR) {
 
                 //ESP_LOGI(TAG, "ESTADO: %d", __task->system->sys_state);
                 switch (__task->system->sys_state) {
-                    case SENSOR_LOOP:
-                        ESP_LOGI(TAG, "Estado: SENSOR_LOOP");
-                        break;
                     case ALL_SENSORS_OK:
-                        ESP_LOGI(TAG, "Estado: ALL_SENSORS_OK");
+                        //ESP_LOGI(TAG, "Estado: ALL_SENSORS_OK");
                         ESP_LOGI(TAG, "Temperatura resultante: %.2f °C", temperature);
                         break;
                     case ONE_SENSOR_FAIL:
-                        ESP_LOGI(TAG, "Estado: ONE_SENSOR_FAIL");
+                        //ESP_LOGI(TAG, "Estado: ONE_SENSOR_FAIL");
                         ESP_LOGW(TAG, "Un sensor fallando. Temperatura mayoritaria: %.2f °C", temperature);
                         break;
                     case CRITICAL_ERROR:
-                        ESP_LOGI(TAG, "Estado: CRITICAL_ERROR");
+                        //ESP_LOGI(TAG, "Estado: CRITICAL_ERROR");
                         ESP_LOGE(TAG, "Error crítico: discrepancias significativas entre los sensores. Deteniendo el sistema.");
                         vTaskDelay(pdMS_TO_TICKS(1000)); // Delay to allow log message to be printed
                         esp_restart(); // Reinicia el sistema
