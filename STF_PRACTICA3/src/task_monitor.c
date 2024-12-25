@@ -37,8 +37,29 @@ SYSTEM_TASK(TASK_MONITOR) {
                 temperature = _therm_lsb2v(result);
                 temperature = _therm_v2t(temperature);
 
-                // Muestra la temperatura resultante
-                ESP_LOGI(TAG, "Temperatura resultante: %.2f °C", temperature);
+                //ESP_LOGI(TAG, "ESTADO: %d", __task->system->sys_state);
+                switch (__task->system->sys_state) {
+                    case SENSOR_LOOP:
+                        ESP_LOGI(TAG, "Estado: SENSOR_LOOP");
+                        break;
+                    case ALL_SENSORS_OK:
+                        ESP_LOGI(TAG, "Estado: ALL_SENSORS_OK");
+                        ESP_LOGI(TAG, "Temperatura resultante: %.2f °C", temperature);
+                        break;
+                    case ONE_SENSOR_FAIL:
+                        ESP_LOGI(TAG, "Estado: ONE_SENSOR_FAIL");
+                        ESP_LOGW(TAG, "Un sensor fallando. Temperatura mayoritaria: %.2f °C", temperature);
+                        break;
+                    case CRITICAL_ERROR:
+                        ESP_LOGI(TAG, "Estado: CRITICAL_ERROR");
+                        ESP_LOGE(TAG, "Error crítico: discrepancias significativas entre los sensores. Deteniendo el sistema.");
+                        vTaskDelay(pdMS_TO_TICKS(1000)); // Delay to allow log message to be printed
+                        esp_restart(); // Reinicia el sistema
+                        break;
+                    default:
+                        ESP_LOGI(TAG, "Estado desconocido.");
+                        break;
+                }
             } else {
                 ESP_LOGE(TAG, "Datos inesperados recibidos: %d bytes", length);
             }

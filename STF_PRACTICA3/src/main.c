@@ -102,7 +102,7 @@ void app_main(void)
 
              // Configuración y arranque de la tarea VOTADOR
             ESP_LOGI(TAG, "Starting votador task...");
-            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor, 0xFFFF}; // Máscara de votación, cuantos más bits menos significativos se quiten, más precisión pierde
+            task_votador_args_t task_votador_args = {&rbuf_sensor, &rbuf_monitor, 0xFF00}; // Máscara de votación, cuantos más bits menos significativos se quiten, más precisión pierde
             system_task_start_in_core(&sys_stf_p1, &task_votador, TASK_VOTADOR, "TASK_VOTADOR", TASK_VOTADOR_STACK_SIZE, &task_votador_args, 0, CORE0);
             ESP_LOGI(TAG, "Votador task started");
 
@@ -123,6 +123,24 @@ void app_main(void)
         {
             STATE_BEGIN();
             ESP_LOGI(TAG, "State: SENSOR_LOOP");
+            STATE_END();
+        }
+        STATE(ALL_SENSORS_OK)
+        {
+            STATE_BEGIN();
+            ESP_LOGI(TAG, "State: ALL_SENSORS_OK");
+            STATE_END();
+        }
+        STATE(ONE_SENSOR_FAIL)
+        {
+            STATE_BEGIN();
+            ESP_LOGI(TAG, "State: ONE_SENSOR_FAIL");
+            STATE_END();
+        }
+        STATE(CRITICAL_ERROR)
+        {
+            STATE_BEGIN();
+            ESP_LOGI(TAG, "State: CRITICAL_ERROR");
             STATE_END();
         }
         STATE_MACHINE_END();

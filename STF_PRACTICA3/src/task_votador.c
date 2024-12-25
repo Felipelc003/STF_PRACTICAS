@@ -5,6 +5,7 @@
 #include <string.h>
 
 static const char* TAG = "STF_P1:task_votador";
+#define N_PERIODS 10
 
 SYSTEM_TASK(TASK_VOTADOR) {
     TASK_BEGIN();
@@ -19,6 +20,7 @@ SYSTEM_TASK(TASK_VOTADOR) {
     void *ptr;
     uint16_t raw_values[3];
     uint16_t result;
+    int period_count = 0;
 
     TASK_LOOP() {
         // Bloquea en espera de datos del RingBuffer de sensores
@@ -47,7 +49,29 @@ SYSTEM_TASK(TASK_VOTADOR) {
                 if (xRingbufferSend(*rbuf_monitor, &result, sizeof(result), pdMS_TO_TICKS(100)) != pdTRUE) {
                     ESP_LOGW(TAG, "Buffer lleno. No se puede enviar el valor resultante.");
                 } 
-               //Había un problema que si se usaba xBufferSendAcquire y xBufferReceive, más adelante al usar vRingbufferReturnItem, se bloqueaba el sistema.
+                 //Había un problema que si se usaba xBufferSendAcquire y xBufferReceive, más adelante al usar vRingbufferReturnItem, se bloqueaba el sistema.
+                  // Comprobar discrepancias cada N periodos
+                if (++period_count >= N_PERIODS) {
+                    period_count = 0;
+                    if ((raw_values[0] != raw_values[1]) && (raw_values[0] != raw_values[2]) && (raw_values[1] != raw_values[2])) {
+                        // Todos los sensores tienen discrepancias significativas
+                        ESP_LOGI(TAG, "T1: %04X, T2: %04X, T3: %04X", raw_values[0], raw_values[1], raw_values[2]);
+                        ESP_LOGI(TAG, "Discrepancias significativas entre todos los sensores. Estado: CRITICAL_ERROR");
+                        __task->system->sys_state = CRITICAL_ERROR;
+
+                    } else if ((raw_values[0] == raw_values[1]) && (raw_values[0] == raw_values[2]) && (raw_values[1] == raw_values[2])) {
+                        // Todos los sensores funcionan correctamente
+                        ESP_LOGI(TAG, "Todos los sensores funcionan correctamente. Estado: ALL_SENSORS_OK");
+                        __task->system->sys_state = ALL_SENSORS_OK;
+
+                    } else {
+                        
+                         // Un sensor tiene discrepancias significativas
+                        ESP_LOGI(TAG, "T1: %04X, T2: %04X, T3: %04X", raw_values[0], raw_values[1], raw_values[2]);
+                        ESP_LOGI(TAG, "Un sensor tiene discrepancias significativas. Estado: ONE_SENSOR_FAIL");
+                        __task->system->sys_state = ONE_SENSOR_FAIL;
+                    }
+                }
             } else {
                 ESP_LOGE(TAG, "Datos inesperados recibidos: %d bytes", length);
             }
