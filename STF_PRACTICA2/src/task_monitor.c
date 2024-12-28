@@ -36,12 +36,6 @@
 
 static const char* TAG = "STF_P1:task_monitor";
 
-// Estructura para recibir datos de los sensores
-// typedef struct {
-//     float temp1; // Temperatura del primer termistor
-//     float temp2; // Temperatura del segundo termistor
-// } sensor_data_t; //Esta estructura ya no se usa y se puede borrar si se quiere
-
 extern system_t sys_stf_p1;
 extern system_task_t task_checker;
 extern system_task_t task_monitor;
@@ -77,41 +71,13 @@ SYSTEM_TASK(TASK_MONITOR) {
             // Devuelves el item al ring buffer
 			vRingbufferReturnItem(*rbuf, ptr);
 
-            //temp1 = message->data;
-
-            // printf("id_source: %d\n", message->id_source);
-            // printf("data: %f\n", message->data);
-            // printf("temp1: %f\n", temp1);
-            // printf("deviation_percentage: %f\n\n\n", deviation_percentage);
-
-			// // Procesar el mensaje según su origen
-			// if (deviation_percentage <= 0.0) {
-			// 	// Mensaje de la tarea Sensor
-			// 	ESP_LOGI(TAG, "Termistor 1: %.2f ºC", temp1);
-
-			// } else if (deviation_percentage > 0) {
-			// 	// Mensaje de la tarea Comprobador
-
-            //     ESP_LOGI(TAG, "Termistor 1: %.2f ºC", temp1);
-			// 	ESP_LOGI(TAG, "Desviación: %.2f %%", deviation_percentage);
-			// } //Código antiguo que ya no sirve y se puede borrar si se quiere
-
+            // Cambia el estado de la máquina según la desviación
             switch(GET_ST_FROM_TASK()) {
                 case NORMAL_MODE:
                     ESP_LOGI(TAG, "NORMAL MODE: T = %.2f ºC", temp1);
-                    if (deviation_percentage > 10.0 && deviation_percentage < 20.0) {
-                        SWITCH_ST_FROM_TASK(DEGRADED_MODE);
-                    } else if (deviation_percentage >= 20.0) {
-                        SWITCH_ST_FROM_TASK(ERROR);
-                    }
                     break;
                 case DEGRADED_MODE:
                     ESP_LOGI(TAG, "DEGRADED MODE: T = (%.2f - %.2f) ºC", temp1 - temp1 * deviation_percentage / 100, temp1 + temp1 * deviation_percentage / 100);
-                    if (deviation_percentage <= 10.0) {
-                        SWITCH_ST_FROM_TASK(NORMAL_MODE);
-                    } else if (deviation_percentage >= 20.0) {
-                        SWITCH_ST_FROM_TASK(ERROR);
-                    }
                     break;
                 case ERROR:
                     ESP_LOGI(TAG, "Sensor ERROR. Repare and restart.");
